@@ -1,7 +1,6 @@
 import express from "express";
 import cors from 'cors';
 import { clerkMiddleware } from "@clerk/express";
-import Router from "./Routes/clerkwebhook.routes";
 import clerkWebHook from "./Controllers/clerkwebhook";
 
 const app = express();
