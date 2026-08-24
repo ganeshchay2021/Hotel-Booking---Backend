@@ -24,7 +24,7 @@ async function clerkWebHook(req, res) {
 
         const userData = {
             _id: data.id,
-            username: data.first_name + '' + data.last_name,
+            username: data.first_name + ' ' + data.last_name,
             email: data.email_addresses[0].email_address,
             image: data.image_url,
         }
