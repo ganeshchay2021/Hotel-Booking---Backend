@@ -15,6 +15,7 @@ app.post(
 
 // JSON middleware AFTER webhook
 app.use(express.json());
+app.use(clerkWebHook());
 
 app.get("/", (req, res) => {
     res.send("API is Working");
