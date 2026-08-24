@@ -1,23 +1,27 @@
 import express from "express";
-import cors from "cors";
-import clerkWebHook from "./Controllers/clerk.controller.js";
+import cors from 'cors';
+import { clerkMiddleware } from "@clerk/express";
+import clerkWebHook from "./Controllers/clerkwebhook.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors())     //enable cross origin resources sharing
 
-// IMPORTANT: Clerk webhook BEFORE express.json()
-app.post(
-    "/api/webhooks/clerk",
-    express.raw({ type: "application/json" }),
-    clerkWebHook
-);
 
-// JSON middleware AFTER webhook
+/*
+* Middlewares
+*/
 app.use(express.json());
-app.use(clerkWebHook());
+app.use(clerkMiddleware())
 
-app.get("/", (req, res) => {
+
+/*
+*   API to listen clerk webhooks
+*/
+app.use("/api/clerk", clerkWebHook)
+
+
+app.get('/', (req, res) => {
     res.send("API is Working");
 });
 
