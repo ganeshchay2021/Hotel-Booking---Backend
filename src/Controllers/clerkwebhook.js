@@ -11,16 +11,16 @@ async function clerkWebHook(req, res) {
 
         //Getting headers
         const headers = {
-            "svix-id": req.headers['svix-id'],
-            'svix-timestamp': req.headers["svix-timestamp"],
-            'svix-signature': req.headers['svix-signature'],
+            "svix-id": req.headers["svix-id"],
+            "svix-timestamp": req.headers["svix-timestamp"],
+            "svix-signature": req.headers["svix-signature"],
         };
 
         //verifing headers
         await webHook.verify(JSON.stringify(req.body), headers);
 
         //getting data from req body
-        const { data, type } = req.body
+        const { data, type } = req.body;
 
         const userData = {
             _id: data.id,
@@ -32,16 +32,16 @@ async function clerkWebHook(req, res) {
         //switch case for different events
 
         switch (type) {
-            case 'user.created': {
+            case "user.created": {
                 await userModel.create(userData);
                 break;
             }
-            case 'user.updated': {
+            case "user.updated": {
                 await userModel.findByIdAndUpdate(data.id, userData);
                 break;
             }
 
-            case 'user.deleted': {
+            case "user.deleted": {
                 await userModel.findByIdAndDelete(data.id);
                 break;
             }
@@ -57,7 +57,7 @@ async function clerkWebHook(req, res) {
 
     } catch (error) {
         console.log(error.message);
-        res.json({
+        res.status(400).json({
             success:false,
             message: error.message
         });
