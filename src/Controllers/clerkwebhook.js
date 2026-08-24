@@ -24,7 +24,7 @@ async function clerkWebHook(req, res) {
         // await webHook.verify(JSON.stringify(req.body), headers);
 
         //getting data from req body
-        const { data, type } = req.body;
+        // const { data, type } = req.body;
 
         const userData = {
             _id: data.id,
