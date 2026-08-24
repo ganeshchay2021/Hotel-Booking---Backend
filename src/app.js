@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(clerkMiddleware())
 
 app.post(
-    "/api/clerk",
+    "/api/webhooks/clerk",
     express.raw({ type: "application/json" }),
     clerkWebHook
 );
