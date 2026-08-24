@@ -2,71 +2,78 @@ import userModel from "../Models/user.model.js";
 import { Webhook } from "svix";
 import config from "../Config/config.js";
 
-
 async function clerkWebHook(req, res) {
     try {
+        console.log("========== CLERK WEBHOOK ==========");
 
-        //create svix instance with clerk webhook secret
         const webHook = new Webhook(config.CLERK_WEBHOOK_KEY);
 
-        //Getting headers
         const headers = {
             "svix-id": req.headers["svix-id"],
             "svix-timestamp": req.headers["svix-timestamp"],
             "svix-signature": req.headers["svix-signature"],
         };
 
+        console.log("Headers:", headers);
+
+        // req.body is Buffer because of express.raw()
         const payload = req.body.toString();
 
+        console.log("Payload received");
+
+        // Verify webhook
         const { data, type } = await webHook.verify(payload, headers);
 
-        //verifing headers
-        // await webHook.verify(JSON.stringify(req.body), headers);
-
-        //getting data from req body
-        // const { data, type } = req.body;
+        console.log("Webhook type:", type);
+        console.log("Clerk user ID:", data.id);
 
         const userData = {
             _id: data.id,
-            username: data.first_name + '' + data.last_name,
-            email: data.email_addresses[0].email_address,
+            username: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
+            email: data.email_addresses?.[0]?.email_address,
             image: data.image_url,
-        }
+        };
 
-        //switch case for different events
+        console.log("User data:", userData);
 
         switch (type) {
-            case "user.created": {
-                await userModel.create(userData);
-                break;
-            }
-            case "user.updated": {
-                await userModel.findByIdAndUpdate(data.id, userData);
-                break;
-            }
 
-            case "user.deleted": {
-                await userModel.findByIdAndDelete(data.id);
+            case "user.created":
+                await userModel.create(userData);
+                console.log("✅ User created in MongoDB");
                 break;
-            }
+
+            case "user.updated":
+                await userModel.findByIdAndUpdate(
+                    data.id,
+                    userData,
+                    { new: true }
+                );
+                console.log("✅ User updated in MongoDB");
+                break;
+
+            case "user.deleted":
+                await userModel.findByIdAndDelete(data.id);
+                console.log("✅ User deleted from MongoDB");
+                break;
 
             default:
-                break;
+                console.log("Unhandled webhook type:", type);
         }
 
-        res.json({
+        return res.status(200).json({
             success: true,
-            message: "Webhook is received"
+            message: "Webhook received",
         });
 
     } catch (error) {
-        console.log(error.message);
-        res.status(400).json({
+        console.error("❌ Webhook Error:", error);
+
+        return res.status(400).json({
             success: false,
-            message: error.message
+            message: error.message,
         });
     }
-
 }
 
 export default clerkWebHook;
