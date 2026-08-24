@@ -21,9 +21,8 @@ const userSchema = new mongoose.Schema({
         enum: ["User", "Owner"],
         default: "User"
     },
-    recentSearchCities: {
-        type: String, required: [true, "recent search cities reauired"]
-    }
+    recentSearchCities: [{
+        type: String, required: true}]
 }, {
     timestamps: true
 });
