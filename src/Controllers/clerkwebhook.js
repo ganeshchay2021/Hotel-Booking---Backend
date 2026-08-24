@@ -16,8 +16,12 @@ async function clerkWebHook(req, res) {
             "svix-signature": req.headers["svix-signature"],
         };
 
+        const payload = req.body.toString();
+
+        const { data, type } = await webHook.verify(payload, headers);
+
         //verifing headers
-        await webHook.verify(JSON.stringify(req.body), headers);
+        // await webHook.verify(JSON.stringify(req.body), headers);
 
         //getting data from req body
         const { data, type } = req.body;
@@ -58,7 +62,7 @@ async function clerkWebHook(req, res) {
     } catch (error) {
         console.log(error.message);
         res.status(400).json({
-            success:false,
+            success: false,
             message: error.message
         });
     }
