@@ -14,16 +14,10 @@ app.use(cors())     //enable cross origin resources sharing
 app.use(express.json());
 app.use(clerkMiddleware())
 
-app.post(
-    "/api/webhooks/clerk",
-    express.raw({ type: "application/json" }),
-    clerkWebHook
-);
-
 /*
 *   API to listen clerk webhooks
 */
-// app.use("/api/clerk", clerkWebHook)
+app.use("/api/clerk", clerkWebHook)
 
 
 app.get('/', (req, res) => {
